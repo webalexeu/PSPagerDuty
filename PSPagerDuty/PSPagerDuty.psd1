@@ -8,6 +8,7 @@
     Description = 'Simple PagerDuty PowerShell module'
     PowerShellVersion = '4.0'
     FunctionsToExport = @(
+        'Add-PagerDutyNote',
         'ConvertFrom-PagerDutyData',
         'Get-PagerDutyData',
         'Get-PagerDutyHeader',
