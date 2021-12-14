@@ -4,7 +4,7 @@ function Add-PagerDutyNote {
             Add a new PagerDuty note for the specified incident from the v2 REST API
         .DESCRIPTION
             Add a new PagerDuty note for the specified incident from the v2 REST API
-    
+
             See PagerDuty documentation for more information:
             https://developer.pagerduty.com/api-reference/b3A6Mjc0ODE1MA-create-a-note-on-an-incident
         .PARAMETER Id
@@ -34,31 +34,39 @@ function Add-PagerDutyNote {
         }})]
         [System.Uri]$Proxy=$Script:PSPagerDutyConfig.Proxy
     )
-    $Headers = @{
-        "Accept" = "application/vnd.pagerduty+json;version=2"
-        "Authorization" = "Token token=$Token"
-        "Content-Type" = "application/json"
-        "From" = "$From"
+    Begin {
     }
-    $uri = "https://api.pagerduty.com/incidents/${Id}/notes"
-    
-    $Payload = @{
-        note = @{
-            content = $Content
+
+    Process {
+        $Headers = @{
+            "Accept" = "application/vnd.pagerduty+json;version=2"
+            "Authorization" = "Token token=$Token"
+            "Content-Type" = "application/json"
+            "From" = "$From"
         }
+        $uri = "https://api.pagerduty.com/incidents/${Id}/notes"
+
+        $Payload = @{
+            note = @{
+                content = $Content
+            }
+        }
+
+        $json = $Payload | ConvertTo-Json -Compress
+
+        $RestMethodParams = @{
+            Method      = 'Post';
+            Uri         = $Uri;
+            Headers     = $Headers;
+            Body        = $json;
+        }
+        if ($Proxy) {
+            $RestMethodParams.Add("Proxy", $Proxy)
+        }
+
+        Invoke-RestMethod @RestMethodParams
     }
 
-    $json = $Payload | ConvertTo-Json -Compress
-
-    $RestMethodParams = @{ 
-        Method      = 'Post';
-        Uri         = $Uri;
-        Headers     = $Headers;
-        Body        = $json;
+    End {
     }
-    if ($Proxy) {
-        $RestMethodParams.Add("Proxy", $Proxy)
-    }
-    
-    Invoke-RestMethod @RestMethodParams
-    }
+}

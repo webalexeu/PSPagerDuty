@@ -4,7 +4,7 @@ function Get-PagerDutyNote {
             Get PagerDuty notes for the specified incident from the v2 REST API
         .DESCRIPTION
             Get PagerDuty notes for the specified incident from the v2 REST API
-    
+
             See PagerDuty documentation for more information:
             https://developer.pagerduty.com/api-reference/b3A6Mjc0ODE0OQ-list-notes-for-an-incident
         .PARAMETER Id
@@ -28,23 +28,31 @@ function Get-PagerDutyNote {
         }})]
         [System.Uri]$Proxy=$Script:PSPagerDutyConfig.Proxy
     )
-    $Headers = @{
-        "Accept" = "application/vnd.pagerduty+json;version=2"
-        "Authorization" = "Token token=$Token"
-        "Content-Type" = "application/json"
+    Begin {
     }
-    $uri = "https://api.pagerduty.com/incidents/${Id}/notes"
 
-    $RestMethodParams = @{ 
-        Method      = 'Get';
-        Uri         = $Uri;
-        Headers     = $Headers;
+    Process {
+        $Headers = @{
+            "Accept" = "application/vnd.pagerduty+json;version=2"
+            "Authorization" = "Token token=$Token"
+            "Content-Type" = "application/json"
+        }
+        $uri = "https://api.pagerduty.com/incidents/${Id}/notes"
+
+        $RestMethodParams = @{
+            Method      = 'Get';
+            Uri         = $Uri;
+            Headers     = $Headers;
+        }
+        if ($Proxy) {
+            $RestMethodParams.Add("Proxy", $Proxy)
+        }
+
+        $Response = $null
+        $Response=Invoke-RestMethod @RestMethodParams
+        ConvertFrom-PagerDutyData -InputObject $Response.notes
     }
-    if ($Proxy) {
-        $RestMethodParams.Add("Proxy", $Proxy)
+
+    End {
     }
-    
-    $Response = $null
-    $Response=Invoke-RestMethod @RestMethodParams
-    ConvertFrom-PagerDutyData -InputObject $Response.notes
 }
